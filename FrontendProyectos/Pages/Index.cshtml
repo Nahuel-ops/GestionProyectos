@@ -1,10 +1,45 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="p-5 mb-4 bg-success text-white rounded-4 shadow-sm">
+    <div class="container-fluid py-3">
+        <h1 class="display-5 fw-bold"><i class="bi bi-diagram-3-fill me-2"></i>Gestión de Jefes y Proyectos</h1>
+        <p class="col-md-8 fs-5 opacity-90">
+            Administra jefes de área, asigna proyectos únicos (1 a 1) y consulta detalles por ID con seguridad JWT.
+        </p>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            <a asp-page="/Jefes/Index" class="btn btn-light text-success btn-lg fw-bold px-4 rounded-pill shadow-sm">
+                <i class="bi bi-person-vcard-fill me-1"></i> Gestionar Jefes
+            </a>
+            <a asp-page="/Proyectos/Index" class="btn btn-outline-light btn-lg fw-bold px-4 rounded-pill">
+                <i class="bi bi-folder-check me-1"></i> Proyectos y Búsqueda por ID
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <div class="text-success fs-2 mb-2"><i class="bi bi-person-vcard-fill"></i></div>
+                <h5 class="card-title fw-bold">Jefes de Proyecto</h5>
+                <p class="card-text text-muted">Registro y listado de jefes con validación de nombre único.</p>
+                <a asp-page="/Jefes/Index" class="btn btn-outline-success btn-sm rounded-pill fw-semibold">Ir a Jefes</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <div class="text-success fs-2 mb-2"><i class="bi bi-search"></i></div>
+                <h5 class="card-title fw-bold">Proyectos &amp; Consulta por ID</h5>
+                <p class="card-text text-muted">Asignación exclusiva 1 a 1 y búsqueda por ID mostrando los datos completos del Jefe.</p>
+                <a asp-page="/Proyectos/Index" class="btn btn-outline-success btn-sm rounded-pill fw-semibold">Ir a Proyectos</a>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,176 @@
+@page
+@model FrontendProyectos.Pages.Proyectos.IndexModel
+@{
+    ViewData["Title"] = "Proyectos";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-success mb-0"><i class="bi bi-folder-check me-2"></i>Gestión de Proyectos</h2>
+        <small class="text-muted">Total registrados: <strong>@Model.TotalRegistros</strong> proyectos · Jefes libres: <strong>@Model.JefesDisponibles.Count</strong></small>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="alert @(Model.EsError ? "alert-danger" : "alert-success") alert-dismissible fade show shadow-sm" role="alert">
+        @Model.Mensaje
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- BUSCADOR DE PROYECTO POR ID PARA MOSTRAR SU JEFE -->
+<div class="card border-success border-opacity-50 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+        <h5 class="fw-bold text-success mb-3"><i class="bi bi-search me-2"></i>Buscar Proyecto por ID y Mostrar Jefe Asignado</h5>
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-9">
+                <input type="text" name="buscarId" value="@Model.IdBuscado" class="form-control"
+                       placeholder="Pega aquí el ID (Guid) del proyecto o haz clic en 'Consultar Jefe' en la tabla..." />
+            </div>
+            <div class="col-md-3 d-grid">
+                <button type="submit" class="btn btn-success fw-bold">
+                    <i class="bi bi-search me-1"></i> Buscar Proyecto
+                </button>
+            </div>
+        </form>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorBusqueda))
+        {
+            <div class="alert alert-danger mt-3 mb-0">@Model.ErrorBusqueda</div>
+        }
+
+        @if (Model.ProyectoEncontrado != null)
+        {
+            <div class="mt-4 p-3 bg-success bg-opacity-10 border border-success rounded-3">
+                <div class="row g-3">
+                    <div class="col-md-6 border-end border-success border-opacity-25">
+                        <span class="badge bg-success mb-2">DATOS DEL PROYECTO</span>
+                        <h5 class="fw-bold mb-1">@Model.ProyectoEncontrado.Nombre</h5>
+                        <p class="text-muted small mb-1"><strong>ID:</strong> @Model.ProyectoEncontrado.Id</p>
+                        <p class="mb-1"><strong>Descripción:</strong> @Model.ProyectoEncontrado.Descripcion</p>
+                        <p class="mb-0"><strong>Estado:</strong> <span class="badge bg-success">@Model.ProyectoEncontrado.Estado</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="badge bg-dark mb-2">JEFE A CARGO</span>
+                        @if (Model.ProyectoEncontrado.Jefe != null)
+                        {
+                            <h5 class="fw-bold text-success mb-1">@Model.ProyectoEncontrado.Jefe.Nombre</h5>
+                            <p class="mb-1"><strong>Cargo:</strong> @Model.ProyectoEncontrado.Jefe.Cargo</p>
+                            <p class="mb-1"><strong>Correo:</strong> @Model.ProyectoEncontrado.Jefe.Correo</p>
+                            <p class="text-muted small mb-0"><strong>ID Jefe:</strong> @Model.ProyectoEncontrado.Jefe.Id</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- FORMULARIO POST PROYECTO -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle-fill me-2"></i>Nuevo Proyecto</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    <div class="mb-3">
+                        <label asp-for="NuevoProyecto.Nombre" class="form-label fw-semibold">Nombre del Proyecto</label>
+                        <input asp-for="NuevoProyecto.Nombre" class="form-control" placeholder="Nombre único del proyecto" required />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NuevoProyecto.Descripcion" class="form-label fw-semibold">Descripción</label>
+                        <textarea asp-for="NuevoProyecto.Descripcion" rows="2" class="form-control" placeholder="Objetivo del proyecto" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NuevoProyecto.Estado" class="form-label fw-semibold">Estado</label>
+                        <select asp-for="NuevoProyecto.Estado" class="form-select" required>
+                            <option value="Planificado">Planificado</option>
+                            <option value="En Progreso">En Progreso</option>
+                            <option value="En Revisión">En Revisión</option>
+                            <option value="Finalizado">Finalizado</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="NuevoProyecto.IdJefe" class="form-label fw-semibold">Jefe a Cargo (1 a 1)</label>
+                        <select asp-for="NuevoProyecto.IdJefe" class="form-select" required>
+                            <option value="">-- Selecciona un Jefe --</option>
+                            <optgroup label="Jefes Disponibles (Sin proyecto)">
+                                @foreach (var j in Model.JefesDisponibles)
+                                {
+                                    <option value="@j.Id">@j.Nombre (@j.Cargo)</option>
+                                }
+                            </optgroup>
+                            <optgroup label="Todos los Jefes (Validar restricción 1 a 1)">
+                                @foreach (var j in Model.TodosLosJefes)
+                                {
+                                    <option value="@j.Id">@j.Nombre - @j.Cargo</option>
+                                }
+                            </optgroup>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill">
+                        Registrar Proyecto
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLA DE PROYECTOS -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-success text-success">
+                        <tr>
+                            <th>Proyecto</th>
+                            <th>Estado</th>
+                            <th>Jefe Asignado</th>
+                            <th class="text-end">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ListaProyectos)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@item.Nombre</div>
+                                    <small class="text-muted d-block">ID: @item.Id</small>
+                                </td>
+                                <td><span class="badge bg-success bg-opacity-10 text-success">@item.Estado</span></td>
+                                <td>@item.Jefe?.Nombre</td>
+                                <td class="text-end">
+                                    <a asp-page="/Proyectos/Index" asp-route-pagina="@Model.PaginaActual" asp-route-buscarId="@item.Id"
+                                       class="btn btn-outline-success btn-sm rounded-pill">
+                                        Consultar Jefe
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TotalPaginas > 1)
+            {
+                <div class="card-footer bg-white py-3 d-flex justify-content-between align-items-center">
+                    <span class="small text-muted">Página @Model.PaginaActual de @Model.TotalPaginas</span>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            @for (int i = 1; i <= Model.TotalPaginas; i++)
+                            {
+                                <li class="page-item @(i == Model.PaginaActual ? "active" : "")">
+                                    <a class="page-link @(i == Model.PaginaActual ? "bg-success border-success text-white" : "text-success")"
+                                       asp-page="/Proyectos/Index" asp-route-pagina="@i">@i</a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>

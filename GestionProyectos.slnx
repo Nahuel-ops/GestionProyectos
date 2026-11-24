@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="BackendProyectos/BackendProyectos.csproj" />
+  <Project Path="ContratoProyectos/ContratoProyectos.csproj" />
+  <Project Path="FrontendProyectos/FrontendProyectos.csproj" />
+</Solution>
